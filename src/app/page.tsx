@@ -110,6 +110,12 @@ export default function Home() {
           profile={profile}
           socialLinks={socialLinks}
           defaultResume={defaultResume}
+          projectsCount={projects.length}
+          skillsCount={skills.reduce((acc, skill) => {
+            const names = skill.name.split(',').map(n => n.trim()).filter(Boolean);
+            return acc + names.length;
+          }, 0)}
+          experiences={experiences}
         />
       )}
 

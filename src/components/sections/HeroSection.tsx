@@ -5,13 +5,16 @@ import { motion } from 'framer-motion';
 import { Download, Mail, MapPin, ChevronDown, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Button from '@/components/ui/Button';
-import type { UserProfile, SocialLink, Resume } from '@/lib/types';
+import type { UserProfile, SocialLink, Resume, Experience } from '@/lib/types';
 import * as LucideIcons from 'lucide-react';
 
 interface HeroSectionProps {
   profile: UserProfile | null;
   socialLinks: SocialLink[];
   defaultResume: Resume | null;
+  projectsCount?: number;
+  skillsCount?: number;
+  experiences?: Experience[];
 }
 
 const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
@@ -23,9 +26,45 @@ const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
   duration: Math.random() * 8 + 6,
 }));
 
-export default function HeroSection({ profile, socialLinks, defaultResume }: HeroSectionProps) {
+export default function HeroSection({ profile, socialLinks, defaultResume, projectsCount, skillsCount, experiences }: HeroSectionProps) {
   const [currentRoleIndex, setCurrentRoleIndex] = useState(0);
   const roles = profile?.roles || ['Developer'];
+
+  // Calculate dynamic stats values
+  const displayProjectsCount = projectsCount !== undefined ? `${projectsCount}` : '0';
+  const displaySkillsCount = skillsCount !== undefined ? `${skillsCount}` : '0';
+
+  const getExperienceDuration = () => {
+    if (!experiences || experiences.length === 0) return '0 yr';
+    
+    let totalMonths = 0;
+    experiences.forEach((exp) => {
+      if (!exp.startDate) return;
+      const start = exp.startDate.toDate ? exp.startDate.toDate() : new Date(exp.startDate as any);
+      const end = exp.isCurrent || !exp.endDate
+        ? new Date()
+        : (exp.endDate.toDate ? exp.endDate.toDate() : new Date(exp.endDate as any));
+      
+      const months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+      totalMonths += Math.max(0, months);
+    });
+
+    if (totalMonths === 0) return '0 yr';
+    const years = totalMonths / 12;
+    if (years < 1) {
+      return `${totalMonths} mo${totalMonths > 1 ? 's' : ''}`;
+    }
+    const roundedYears = Math.round(years * 10) / 10;
+    return `${roundedYears} yr${roundedYears > 1 ? 's' : ''}`;
+  };
+
+  const displayExperience = getExperienceDuration();
+
+  const stats = [
+    { label: 'Projects', value: displayProjectsCount },
+    { label: 'Skills', value: displaySkillsCount },
+    { label: 'Experience', value: displayExperience },
+  ];
 
   useEffect(() => {
     if (roles.length <= 1) return;
@@ -265,11 +304,7 @@ export default function HeroSection({ profile, socialLinks, defaultResume }: Her
           transition={{ duration: 0.6, delay: 1.1 }}
           className="mt-10 sm:mt-16 grid grid-cols-3 gap-2 sm:gap-4 max-w-xs sm:max-w-sm mx-auto"
         >
-          {[
-            { label: 'Projects', value: '10+' },
-            { label: 'Skills', value: '20+' },
-            { label: 'Experience', value: '1yr+' },
-          ].map((stat) => (
+          {stats.map((stat) => (
             <div key={stat.label} className="text-center p-2 sm:p-3 rounded-xl sm:rounded-2xl glass border border-[var(--color-border)]">
               <p className="text-base sm:text-xl font-bold gradient-text">{stat.value}</p>
               <p className="text-[10px] sm:text-xs text-[var(--color-text-muted)] mt-0.5">{stat.label}</p>
