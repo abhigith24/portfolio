@@ -35,7 +35,7 @@ export default function HeroSection({ profile, socialLinks, defaultResume, proje
   const displaySkillsCount = skillsCount !== undefined ? `${skillsCount}` : '0';
 
   const getExperienceDuration = () => {
-    if (!experiences || experiences.length === 0) return '0 yr';
+    if (!experiences || experiences.length === 0) return '0 Years';
     
     let totalMonths = 0;
     experiences.forEach((exp) => {
@@ -49,13 +49,13 @@ export default function HeroSection({ profile, socialLinks, defaultResume, proje
       totalMonths += Math.max(0, months);
     });
 
-    if (totalMonths === 0) return '0 yr';
+    if (totalMonths === 0) return '0 Years';
     const years = totalMonths / 12;
     if (years < 1) {
-      return `${totalMonths} mo${totalMonths > 1 ? 's' : ''}`;
+      return `${totalMonths} Month${totalMonths > 1 ? 's' : ''}`;
     }
     const roundedYears = Math.round(years * 10) / 10;
-    return `${roundedYears} yr${roundedYears > 1 ? 's' : ''}`;
+    return `${roundedYears} Year${roundedYears > 1 ? 's' : ''}`;
   };
 
   const displayExperience = getExperienceDuration();
