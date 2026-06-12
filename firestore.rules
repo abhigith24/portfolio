@@ -1,0 +1,43 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Public read for portfolio content
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /projects/{projectId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /skills/{skillId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /experiences/{expId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /certifications/{certId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /resumes/{resumeId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /socialLinks/{linkId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /contactMessages/{msgId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+    match /settings/{settingId} {
+      allow read: if true;
+      allow create, delete: if request.auth != null;
+      allow update: if request.auth != null || (resource != null && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['visitorCount']));
+    }
+  }
+}
