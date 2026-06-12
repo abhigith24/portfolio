@@ -32,12 +32,28 @@ export default function SkillsSection({ skills }: SkillsSectionProps) {
 
   const categories = Object.keys(grouped).sort();
 
+  // Calculate total individual skills across all categories
+  const totalSkillsCount = skills.reduce((acc, skill) => {
+    const names = skill.name.split(',').map(n => n.trim()).filter(Boolean);
+    return acc + names.length;
+  }, 0);
+
   return (
     <SectionWrapper id="skills" title="My Skills" subtitle="Technologies and tools I work with">
       <div className="space-y-5">
         {categories.map((cat, catIdx) => {
           const cfg = getCat(cat);
           const catSkills = grouped[cat].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+          // Split any comma-separated skill names into separate virtual skill items
+          const splitSkills = catSkills.flatMap((skill) => {
+            const names = skill.name.split(',').map(n => n.trim()).filter(Boolean);
+            return names.map((name, nameIdx) => ({
+              ...skill,
+              name,
+              id: `${skill.id}-${nameIdx}`
+            }));
+          });
 
           return (
             <motion.div
@@ -53,7 +69,7 @@ export default function SkillsSection({ skills }: SkillsSectionProps) {
                 <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${cfg.dot}`} />
                 <span className={`text-sm font-bold ${cfg.label} leading-tight`}>{cat}</span>
                 <span className="text-[10px] text-[var(--color-text-muted)] font-medium sm:block hidden">
-                  {catSkills.length} skill{catSkills.length > 1 ? 's' : ''}
+                  {splitSkills.length} skill{splitSkills.length > 1 ? 's' : ''}
                 </span>
               </div>
 
@@ -62,7 +78,7 @@ export default function SkillsSection({ skills }: SkillsSectionProps) {
 
               {/* Skills pills row — wraps on small screens */}
               <div className="flex flex-wrap gap-2 flex-1">
-                {catSkills.map((skill, idx) => (
+                {splitSkills.map((skill, idx) => (
                   <motion.div
                     key={skill.id}
                     initial={{ opacity: 0, scale: 0.85 }}
@@ -105,7 +121,7 @@ export default function SkillsSection({ skills }: SkillsSectionProps) {
         transition={{ duration: 0.5, delay: 0.4 }}
         className="text-center text-xs text-[var(--color-text-muted)] mt-8"
       >
-        {skills.length} skills across {categories.length} categories
+        {totalSkillsCount} skills across {categories.length} categories
       </motion.p>
     </SectionWrapper>
   );
