@@ -14,6 +14,7 @@ export const ADMIN_NAV_ITEMS = [
   { label: 'Profile', href: '/admin/profile', icon: 'User' },
   { label: 'Projects', href: '/admin/projects', icon: 'FolderKanban' },
   { label: 'Skills', href: '/admin/skills', icon: 'Wrench' },
+  { label: 'Timeline', href: '/admin/timeline', icon: 'Compass' },
   { label: 'Experience', href: '/admin/experience', icon: 'Briefcase' },
   { label: 'Certifications', href: '/admin/certifications', icon: 'Award' },
   { label: 'Resumes', href: '/admin/resumes', icon: 'FileText' },

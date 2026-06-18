@@ -69,16 +69,22 @@ export default function AdminSkillsPage() {
     if (val !== '__custom__') setCustomCategory('');
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Delete this skill?')) return;
+  const [deletingSkill, setDeletingSkill] = useState<(Skill & { id: string }) | null>(null);
+
+  const confirmDelete = async () => {
+    if (!deletingSkill) return;
+    setSaving(true);
     try {
-      console.log('Attempting to delete skill with ID:', id);
-      await deleteDocument('skills', id);
+      console.log('Attempting to delete skill with ID:', deletingSkill.id);
+      await deleteDocument('skills', deletingSkill.id);
       console.log('Skill deleted successfully, reloading list.');
       await fetchSkills();
+      setDeletingSkill(null);
     } catch (err) {
       console.error('Failed to delete skill:', err);
       alert('Error deleting skill: ' + (err instanceof Error ? err.message : String(err)));
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -114,7 +120,7 @@ export default function AdminSkillsPage() {
                   </div>
                   <div className="flex gap-1">
                     <button onClick={() => openEdit(s)} className="p-1.5 rounded-lg hover:bg-[var(--color-surface)] text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors cursor-pointer"><Edit2 size={14} /></button>
-                    <button onClick={() => handleDelete(s.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-[var(--color-text-muted)] hover:text-red-500 transition-colors cursor-pointer"><Trash2 size={14} /></button>
+                    <button onClick={() => setDeletingSkill(s)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-[var(--color-text-muted)] hover:text-red-500 transition-colors cursor-pointer"><Trash2 size={14} /></button>
                   </div>
                 </div>
               </Card>
@@ -163,6 +169,21 @@ export default function AdminSkillsPage() {
           <div className="flex justify-end gap-3 pt-4 border-t border-[var(--color-border)]">
             <Button variant="secondary" onClick={() => setIsModalOpen(false)}>Cancel</Button>
             <Button onClick={handleSave} isLoading={saving}>{editingId ? 'Update' : 'Create'}</Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal isOpen={!!deletingSkill} onClose={() => setDeletingSkill(null)} title="Delete Skill">
+        <div className="space-y-4">
+          <p className="text-sm text-[var(--color-text-secondary)]">
+            Are you sure you want to delete the skill <strong>{deletingSkill?.name}</strong>? This action cannot be undone.
+          </p>
+          <div className="flex justify-end gap-3 pt-4 border-t border-[var(--color-border)]">
+            <Button variant="secondary" onClick={() => setDeletingSkill(null)}>Cancel</Button>
+            <Button variant="primary" className="bg-red-600 hover:bg-red-700 text-white" onClick={confirmDelete} isLoading={saving}>
+              Delete Skill
+            </Button>
           </div>
         </div>
       </Modal>

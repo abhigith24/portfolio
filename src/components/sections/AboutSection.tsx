@@ -3,45 +3,58 @@
 import { motion } from 'framer-motion';
 import { User, Target, MapPin, Phone, Mail, GraduationCap, Compass, Briefcase, CheckCircle } from 'lucide-react';
 import SectionWrapper from '@/components/ui/SectionWrapper';
-import type { UserProfile } from '@/lib/types';
+import type { UserProfile, TimelineItem } from '@/lib/types';
 
 interface AboutSectionProps {
   profile: UserProfile | null;
+  timelineItems?: TimelineItem[];
 }
 
-export default function AboutSection({ profile }: AboutSectionProps) {
+const ICON_MAP = {
+  education: GraduationCap,
+  work: Briefcase,
+  project: Compass,
+  success: CheckCircle,
+};
+
+export default function AboutSection({ profile, timelineItems = [] }: AboutSectionProps) {
   if (!profile) return null;
 
-  const timelineItems = [
+  const staticTimelineItems = [
     {
       year: '2022',
       title: 'Started B.Tech CSE',
       description: 'Began Bachelor of Technology in Computer Science & Engineering, building fundamentals in algorithms, structures, and software engineering.',
       icon: GraduationCap,
-      color: 'border-blue-500'
     },
     {
       year: '2024',
       title: 'Java Internship',
       description: 'Worked on Java development and testing. Gained hands-on experience writing scripts, diagnosing bugs, and working in engineering pipelines.',
       icon: Briefcase,
-      color: 'border-indigo-500'
     },
     {
       year: '2025',
       title: 'CampusMart Project',
       description: 'Developed CampusMart. Built critical modules, automated testing infrastructure, conducted manual test suites, and validated user flows.',
       icon: Compass,
-      color: 'border-cyan-500'
     },
     {
       year: '2026',
       title: 'Graduation',
       description: 'Completed B.Tech CSE. Eagerly seeking QA Engineer & Java Developer roles to deliver reliable software solutions.',
       icon: CheckCircle,
-      color: 'border-emerald-500'
     }
   ];
+
+  const itemsToRender = timelineItems && timelineItems.length > 0
+    ? timelineItems.map(item => ({
+        year: item.year,
+        title: item.title,
+        description: item.description,
+        icon: ICON_MAP[item.icon as keyof typeof ICON_MAP] || Compass,
+      }))
+    : staticTimelineItems;
 
   return (
     <SectionWrapper id="about" title="About Me" subtitle="My background, career goals, and professional milestones">
@@ -140,7 +153,7 @@ export default function AboutSection({ profile }: AboutSectionProps) {
             </h3>
             
             <div className="relative pl-6 space-y-8 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-[var(--color-border)]">
-              {timelineItems.map((item, idx) => {
+              {itemsToRender.map((item, idx) => {
                 const Icon = item.icon;
                 return (
                   <motion.div

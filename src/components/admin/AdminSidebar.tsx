@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import {
   LayoutDashboard, User, FolderKanban, Wrench, Briefcase, Award,
-  FileText, Share2, MessageSquare, Settings, LogOut, ChevronLeft, Menu,
+  FileText, Share2, MessageSquare, Settings, LogOut, ChevronLeft, Menu, ArrowLeft, Compass,
 } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { signOut } from '@/lib/firebase/auth';
@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 
 const ICONS: Record<string, React.ComponentType<{ size?: number }>> = {
   LayoutDashboard, User, FolderKanban, Wrench, Briefcase, Award,
-  FileText, Share2, MessageSquare, Settings,
+  FileText, Share2, MessageSquare, Settings, Compass,
 };
 
 import { ADMIN_NAV_ITEMS } from '@/lib/constants';
@@ -67,6 +67,21 @@ export default function AdminSidebar() {
                 <ChevronLeft size={18} className={cn('transition-transform', collapsed && 'rotate-180')} />
               </button>
             </div>
+          </div>
+
+          {/* Back to Portfolio Link */}
+          <div className="p-3 border-b border-[var(--color-border)]">
+            <Link
+              href="/"
+              className={cn(
+                "flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200",
+                "text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/5"
+              )}
+              title={collapsed ? "Back to Portfolio" : undefined}
+            >
+              <ArrowLeft size={18} />
+              {!collapsed && <span>Back to Portfolio</span>}
+            </Link>
           </div>
 
           {/* Nav Items */}

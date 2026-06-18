@@ -24,6 +24,7 @@ import type {
   Resume,
   SocialLink,
   GeneralSettings,
+  TimelineItem,
 } from '@/lib/types';
 
 export default function Home() {
@@ -36,9 +37,19 @@ export default function Home() {
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
   const [settings, setSettings] = useState<GeneralSettings | null>(null);
+  const [timeline, setTimeline] = useState<TimelineItem[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
+      const fetchOrFallback = async <T,>(promise: Promise<T>, fallback: T): Promise<T> => {
+        try {
+          return await promise;
+        } catch (err) {
+          console.error('Failed to fetch data, falling back:', err);
+          return fallback;
+        }
+      };
+
       try {
         const [
           profileData,
@@ -49,15 +60,17 @@ export default function Home() {
           resumesData,
           socialLinksData,
           settingsData,
+          timelineData,
         ] = await Promise.all([
-          getDocument<UserProfile>('users', 'main'),
-          getDocuments<Project>('projects', orderBy('order', 'asc')),
-          getDocuments<Skill>('skills', orderBy('order', 'asc')),
-          getDocuments<Experience>('experiences', orderBy('order', 'asc')),
-          getDocuments<Certification>('certifications', orderBy('order', 'asc')),
-          getDocuments<Resume>('resumes'),
-          getDocuments<SocialLink>('socialLinks', orderBy('order', 'asc')),
-          getDocument<GeneralSettings>('settings', 'general'),
+          fetchOrFallback(getDocument<UserProfile>('users', 'main'), null),
+          fetchOrFallback(getDocuments<Project>('projects', orderBy('order', 'asc')), []),
+          fetchOrFallback(getDocuments<Skill>('skills', orderBy('order', 'asc')), []),
+          fetchOrFallback(getDocuments<Experience>('experiences', orderBy('order', 'asc')), []),
+          fetchOrFallback(getDocuments<Certification>('certifications', orderBy('order', 'asc')), []),
+          fetchOrFallback(getDocuments<Resume>('resumes'), []),
+          fetchOrFallback(getDocuments<SocialLink>('socialLinks', orderBy('order', 'asc')), []),
+          fetchOrFallback(getDocument<GeneralSettings>('settings', 'general'), null),
+          fetchOrFallback(getDocuments<TimelineItem>('timeline', orderBy('order', 'asc')), []),
         ]);
 
         setProfile(profileData);
@@ -68,6 +81,7 @@ export default function Home() {
         setResumes(resumesData);
         setSocialLinks(socialLinksData);
         setSettings(settingsData);
+        setTimeline(timelineData);
       } catch (err) {
         console.error('Error fetching portfolio data:', err);
       } finally {
@@ -120,7 +134,7 @@ export default function Home() {
         />
       )}
 
-      {enabled.about && <AboutSection profile={profile} />}
+      {enabled.about && <AboutSection profile={profile} timelineItems={timeline} />}
 
       {enabled.skills && skills.length > 0 && <SkillsSection skills={skills} />}
 
