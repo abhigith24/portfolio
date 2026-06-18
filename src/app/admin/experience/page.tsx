@@ -59,8 +59,15 @@ export default function AdminExperiencePage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this experience?')) return;
-    await deleteDocument('experiences', id);
-    await fetchData();
+    try {
+      console.log('Attempting to delete experience with ID:', id);
+      await deleteDocument('experiences', id);
+      console.log('Experience deleted successfully, reloading list.');
+      await fetchData();
+    } catch (err) {
+      console.error('Failed to delete experience:', err);
+      alert('Error deleting experience: ' + (err instanceof Error ? err.message : String(err)));
+    }
   };
 
   return (

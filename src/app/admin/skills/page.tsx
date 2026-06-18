@@ -71,8 +71,15 @@ export default function AdminSkillsPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this skill?')) return;
-    await deleteDocument('skills', id);
-    await fetchSkills();
+    try {
+      console.log('Attempting to delete skill with ID:', id);
+      await deleteDocument('skills', id);
+      console.log('Skill deleted successfully, reloading list.');
+      await fetchSkills();
+    } catch (err) {
+      console.error('Failed to delete skill:', err);
+      alert('Error deleting skill: ' + (err instanceof Error ? err.message : String(err)));
+    }
   };
 
   const grouped = skills.reduce((acc, s) => {

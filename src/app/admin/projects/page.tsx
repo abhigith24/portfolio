@@ -72,8 +72,15 @@ export default function AdminProjectsPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this project?')) return;
-    await deleteDocument('projects', id);
-    await fetchProjects();
+    try {
+      console.log('Attempting to delete project with ID:', id);
+      await deleteDocument('projects', id);
+      console.log('Project deleted successfully, reloading list.');
+      await fetchProjects();
+    } catch (err) {
+      console.error('Failed to delete project:', err);
+      alert('Error deleting project: ' + (err instanceof Error ? err.message : String(err)));
+    }
   };
 
   const toggleFeatured = async (id: string, current: boolean) => {

@@ -56,8 +56,15 @@ export default function AdminCertificationsPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this certification?')) return;
-    await deleteDocument('certifications', id);
-    await fetchData();
+    try {
+      console.log('Attempting to delete certification with ID:', id);
+      await deleteDocument('certifications', id);
+      console.log('Certification deleted successfully, reloading list.');
+      await fetchData();
+    } catch (err) {
+      console.error('Failed to delete certification:', err);
+      alert('Error deleting certification: ' + (err instanceof Error ? err.message : String(err)));
+    }
   };
 
   return (
