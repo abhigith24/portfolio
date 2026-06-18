@@ -116,6 +116,7 @@ export default function Home() {
             return acc + names.length;
           }, 0)}
           experiences={experiences}
+          certificationsCount={certifications.length}
         />
       )}
 

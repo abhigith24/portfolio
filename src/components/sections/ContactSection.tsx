@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
 import { addDocument } from '@/lib/firebase/firestore';
 import type { SocialLink, ContactInfo } from '@/lib/types';
-import * as LucideIcons from 'lucide-react';
+import { getIconByName } from '@/lib/getIcon';
 
 interface ContactSectionProps {
   socialLinks: SocialLink[];
@@ -21,10 +21,7 @@ export default function ContactSection({ socialLinks, contactInfo }: ContactSect
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
 
-  const getIcon = (iconName: string) => {
-    const Icon = (LucideIcons as unknown as Record<string, React.ComponentType<{ size?: number }>>)[iconName];
-    return Icon ? <Icon size={18} /> : null;
-  };
+  const getIcon = (iconName: string) => getIconByName(iconName, { size: 18 });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -118,7 +115,7 @@ export default function ContactSection({ socialLinks, contactInfo }: ContactSect
                   className="flex items-center gap-2 text-sm text-emerald-500 bg-emerald-500/10 rounded-xl p-3"
                 >
                   <CheckCircle size={16} />
-                  Message sent successfully! I&apos;ll get back to you soon.
+                  Thank you for reaching out. I&apos;ll get back to you soon.
                 </motion.div>
               )}
               {status === 'error' && (

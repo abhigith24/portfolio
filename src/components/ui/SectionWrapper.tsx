@@ -30,7 +30,7 @@ export default function SectionWrapper({ children, id, className, title, subtitl
         initial={{ opacity: 0, y: 50 }}
         animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="relative max-w-6xl mx-auto"
+        className="relative max-w-[1280px] mx-auto w-full px-4 sm:px-6 lg:px-8"
       >
         {(title || subtitle || badge) && (
           <div className="text-center mb-14">
@@ -51,7 +51,7 @@ export default function SectionWrapper({ children, id, className, title, subtitl
                 initial={{ opacity: 0, y: 20 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: 0.15 }}
-                className="text-3xl md:text-4xl lg:text-5xl font-bold text-[var(--color-text)] mb-4"
+                className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-[var(--color-text)] mb-4"
               >
                 {title.split(' ').map((word, i, arr) =>
                   i === arr.length - 1 ? (
@@ -68,7 +68,7 @@ export default function SectionWrapper({ children, id, className, title, subtitl
               initial={{ scaleX: 0 }}
               animate={isInView ? { scaleX: 1 } : {}}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="w-16 h-1 rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 mx-auto mb-4"
+              className="w-16 h-1 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] mx-auto mb-4"
             />
 
             {subtitle && (

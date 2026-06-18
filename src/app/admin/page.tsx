@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FolderKanban, Wrench, MessageSquare, Eye, Award, Briefcase } from 'lucide-react';
 import { getDocuments, getDocument } from '@/lib/firebase/firestore';
+import { auth } from '@/lib/firebase/config';
 import Card from '@/components/ui/Card';
 import type { GeneralSettings, ContactMessage } from '@/lib/types';
 
@@ -21,15 +22,43 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const fetchStats = async () => {
+      // Log auth state for diagnostics
+      const currentUser = auth.currentUser;
+      console.log('[Dashboard Info] Current User:', currentUser ? { uid: currentUser.uid, email: currentUser.email } : 'Not logged in');
+
+      const newStats = {
+        projects: 0,
+        skills: 0,
+        experiences: 0,
+        certifications: 0,
+        messages: 0,
+        unreadMessages: 0,
+        visitors: 0,
+      };
+
+      // Helper to fetch with logging
+      const fetchCollection = async <T extends import('firebase/firestore').DocumentData>(name: string): Promise<(T & { id: string })[]> => {
+        try {
+          return await getDocuments<T>(name);
+        } catch (err) {
+          console.error(`[Dashboard Error] Failed to fetch collection "${name}":`, err);
+          return [];
+        }
+      };
+
       try {
-        const [projectsData, skillsData, experiencesData, certsData, messagesData, settings] = await Promise.all([
-          getDocuments('projects'),
-          getDocuments('skills'),
-          getDocuments('experiences'),
-          getDocuments('certifications'),
-          getDocuments<ContactMessage>('contactMessages'),
-          getDocument<GeneralSettings>('settings', 'general'),
-        ]);
+        const projectsData = await fetchCollection<any>('projects');
+        const skillsData = await fetchCollection<any>('skills');
+        const experiencesData = await fetchCollection<any>('experiences');
+        const certsData = await fetchCollection<any>('certifications');
+        const messagesData = await fetchCollection<ContactMessage>('contactMessages');
+        
+        let settings = null;
+        try {
+          settings = await getDocument<GeneralSettings>('settings', 'general');
+        } catch (err) {
+          console.error('[Dashboard Error] Failed to fetch document "settings/general":', err);
+        }
 
         setStats({
           projects: projectsData.length,
@@ -41,13 +70,15 @@ export default function AdminDashboard() {
           visitors: settings?.visitorCount || 0,
         });
 
-        setRecentMessages(
-          messagesData
-            .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
-            .slice(0, 5)
-        );
+        if (messagesData.length > 0) {
+          setRecentMessages(
+            [...messagesData]
+              .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
+              .slice(0, 5)
+          );
+        }
       } catch (err) {
-        console.error('Dashboard error:', err);
+        console.error('Dashboard general error:', err);
       }
     };
     fetchStats();

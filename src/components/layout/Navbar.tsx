@@ -51,14 +51,14 @@ export default function Navbar() {
           : 'py-5 bg-transparent'
       )}
     >
-      <div className="max-w-6xl mx-auto px-4 flex items-center justify-between">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Logo */}
         <a
           href="#hero"
           onClick={(e) => { e.preventDefault(); handleNavClick('#hero'); }}
           className="flex items-center gap-2 group"
         >
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg group-hover:shadow-violet-500/30 transition-shadow">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-accent)] flex items-center justify-center shadow-lg group-hover:shadow-[var(--color-primary)]/30 transition-shadow">
             <Code2 size={16} className="text-white" />
           </div>
           <span className="text-lg font-bold gradient-text hidden sm:block">Portfolio</span>

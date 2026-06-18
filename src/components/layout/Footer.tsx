@@ -4,7 +4,7 @@ import { Heart } from 'lucide-react';
 import { useVisitorCount } from '@/lib/hooks/useVisitorCount';
 import { NAV_ITEMS } from '@/lib/constants';
 import type { SocialLink } from '@/lib/types';
-import * as LucideIcons from 'lucide-react';
+import { getIconByName } from '@/lib/getIcon';
 
 interface FooterProps {
   socialLinks?: SocialLink[];
@@ -14,14 +14,11 @@ interface FooterProps {
 export default function Footer({ socialLinks = [], footerText }: FooterProps) {
   const visitorCount = useVisitorCount();
 
-  const getIcon = (iconName: string) => {
-    const Icon = (LucideIcons as unknown as Record<string, React.ComponentType<{ size?: number }>>)[iconName];
-    return Icon ? <Icon size={18} /> : null;
-  };
+  const getIcon = (iconName: string) => getIconByName(iconName, { size: 18 });
 
   return (
     <footer className="border-t border-[var(--color-border)] bg-[var(--color-surface)]">
-      <div className="max-w-6xl mx-auto px-4 py-12">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
           <div>

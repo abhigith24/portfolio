@@ -22,11 +22,11 @@ export default function Button({
   const baseStyles = 'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer';
 
   const variants = {
-    primary: 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-dark)] hover:shadow-lg hover:shadow-[var(--color-primary)]/20 hover:-translate-y-0.5 active:translate-y-0',
-    secondary: 'bg-[var(--color-surface-elevated)] text-[var(--color-text)] border border-[var(--color-border)] hover:bg-[var(--color-surface)] hover:-translate-y-0.5',
-    outline: 'border-2 border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white hover:-translate-y-0.5',
-    ghost: 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface)]',
-    danger: 'bg-[var(--color-error)] text-white hover:bg-red-600 hover:-translate-y-0.5',
+    primary: 'bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] text-white hover:opacity-95 hover:shadow-lg hover:shadow-[var(--color-primary)]/20 hover:-translate-y-0.5 active:translate-y-0 border border-transparent',
+    secondary: 'bg-[var(--color-surface-elevated)] text-[var(--color-text)] border border-[var(--color-border)] hover:bg-[var(--color-surface)] hover:border-[var(--color-primary)]/25 hover:-translate-y-0.5 hover:shadow-sm',
+    outline: 'border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 hover:-translate-y-0.5 hover:shadow-sm',
+    ghost: 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-elevated)]',
+    danger: 'bg-[var(--color-error)] text-white hover:opacity-90 hover:-translate-y-0.5 hover:shadow-md hover:shadow-red-500/10',
   };
 
   const sizes = {

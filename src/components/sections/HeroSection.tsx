@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Download, Mail, MapPin, ChevronDown, Sparkles } from 'lucide-react';
+import { Download, Mail, MapPin, ChevronDown, Sparkles, FolderKanban, Award, GraduationCap, Code } from 'lucide-react';
 import Image from 'next/image';
 import Button from '@/components/ui/Button';
 import type { UserProfile, SocialLink, Resume, Experience } from '@/lib/types';
-import * as LucideIcons from 'lucide-react';
+import { getIconByName } from '@/lib/getIcon';
 
 interface HeroSectionProps {
   profile: UserProfile | null;
@@ -15,91 +15,100 @@ interface HeroSectionProps {
   projectsCount?: number;
   skillsCount?: number;
   experiences?: Experience[];
+  certificationsCount?: number;
 }
 
-const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
+const PARTICLES = Array.from({ length: 15 }, (_, i) => ({
   id: i,
   x: Math.random() * 100,
   y: Math.random() * 100,
-  size: Math.random() * 4 + 2,
-  delay: Math.random() * 6,
-  duration: Math.random() * 8 + 6,
+  size: Math.random() * 3 + 2,
+  delay: Math.random() * 5,
+  duration: Math.random() * 6 + 6,
 }));
 
-export default function HeroSection({ profile, socialLinks, defaultResume, projectsCount, skillsCount, experiences }: HeroSectionProps) {
-  const [currentRoleIndex, setCurrentRoleIndex] = useState(0);
-  const roles = profile?.roles || ['Developer'];
+function AnimatedCounter({ value, duration = 1.2 }: { value: number; duration?: number }) {
+  const [count, setCount] = useState(0);
 
-  // Calculate dynamic stats values
-  const displayProjectsCount = projectsCount !== undefined ? `${projectsCount}` : '0';
-  const displaySkillsCount = skillsCount !== undefined ? `${skillsCount}` : '0';
-
-  const getExperienceDuration = () => {
-    if (!experiences || experiences.length === 0) return '0 Years';
+  useEffect(() => {
+    let start = 0;
+    const end = value;
+    if (end <= 0) return;
+    const totalMiliseconds = duration * 1000;
+    const incrementTime = Math.max(Math.floor(totalMiliseconds / end), 30);
     
-    let totalMonths = 0;
-    experiences.forEach((exp) => {
-      if (!exp.startDate) return;
-      const start = exp.startDate.toDate ? exp.startDate.toDate() : new Date(exp.startDate as any);
-      const end = exp.isCurrent || !exp.endDate
-        ? new Date()
-        : (exp.endDate.toDate ? exp.endDate.toDate() : new Date(exp.endDate as any));
-      
-      const months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
-      totalMonths += Math.max(0, months);
-    });
+    const timer = setInterval(() => {
+      start += 1;
+      setCount(start);
+      if (start >= end) {
+        setCount(end);
+        clearInterval(timer);
+      }
+    }, incrementTime);
 
-    if (totalMonths === 0) return '0 Years';
-    const years = totalMonths / 12;
-    if (years < 1) {
-      return `${totalMonths} Month${totalMonths > 1 ? 's' : ''}`;
-    }
-    const roundedYears = Math.round(years * 10) / 10;
-    return `${roundedYears} Year${roundedYears > 1 ? 's' : ''}`;
-  };
+    return () => clearInterval(timer);
+  }, [value, duration]);
 
-  const displayExperience = getExperienceDuration();
+  return <span>{count}</span>;
+}
 
-  const stats = [
-    { label: 'Projects', value: displayProjectsCount },
-    { label: 'Skills', value: displaySkillsCount },
-    { label: 'Experience', value: displayExperience },
+export default function HeroSection({
+  profile,
+  socialLinks,
+  defaultResume,
+  projectsCount = 4,
+  skillsCount = 10,
+  experiences = [],
+  certificationsCount = 5
+}: HeroSectionProps) {
+  const [currentRoleIndex, setCurrentRoleIndex] = useState(0);
+  
+  const roles = [
+    'B.Tech CSE Graduate',
+    'Aspiring QA Engineer',
+    'Java Developer'
   ];
 
   useEffect(() => {
-    if (roles.length <= 1) return;
     const interval = setInterval(() => {
       setCurrentRoleIndex((prev) => (prev + 1) % roles.length);
-    }, 3000);
+    }, 3200);
     return () => clearInterval(interval);
-  }, [roles.length]);
+  }, []);
 
-  const getIcon = (iconName: string) => {
-    const Icon = (LucideIcons as unknown as Record<string, React.ComponentType<{ size?: number; className?: string }>>)[iconName];
-    return Icon ? <Icon size={20} /> : null;
+  const getIcon = (iconName: string) => getIconByName(iconName, { size: 18 });
+
+  const internshipCount = experiences.filter(e => e.type === 'internship').length || 1;
+
+  const stats = [
+    { label: 'Projects Completed', value: projectsCount || 4, suffix: '+', icon: FolderKanban },
+    { label: 'Internships Done', value: internshipCount || 1, suffix: '+', icon: GraduationCap },
+    { label: 'Technologies Used', value: skillsCount || 10, suffix: '+', icon: Code },
+    { label: 'Certifications', value: certificationsCount || 5, suffix: '+', icon: Award },
+  ];
+
+  const handleScrollTo = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
-    <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 sm:pt-24">
+    <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-24 pb-16">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-[var(--gradient-hero)]" />
 
       {/* Grid overlay */}
-      <div className="absolute inset-0 grid-bg opacity-60" />
+      <div className="absolute inset-0 grid-bg opacity-40" />
 
-      {/* Animated blobs */}
+      {/* Animated premium blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
-          className="absolute w-[500px] h-[500px] bg-gradient-to-br from-violet-400/20 to-indigo-400/20 rounded-full blur-3xl animate-blob"
-          style={{ top: '10%', left: '-10%' }}
+          className="absolute w-[450px] h-[450px] bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-full blur-3xl animate-blob"
+          style={{ top: '8%', left: '-5%' }}
         />
         <div
-          className="absolute w-[400px] h-[400px] bg-gradient-to-br from-pink-400/15 to-purple-400/15 rounded-full blur-3xl animate-blob"
-          style={{ bottom: '10%', right: '-5%', animationDelay: '3s', animationDuration: '10s' }}
-        />
-        <div
-          className="absolute w-[300px] h-[300px] bg-gradient-to-br from-indigo-400/15 to-violet-300/15 rounded-full blur-3xl animate-blob"
-          style={{ top: '50%', right: '20%', animationDelay: '5s', animationDuration: '12s' }}
+          className="absolute w-[400px] h-[400px] bg-gradient-to-br from-cyan-500/10 to-sky-500/5 rounded-full blur-3xl animate-blob"
+          style={{ bottom: '15%', right: '-5%', animationDelay: '3s', animationDuration: '9s' }}
         />
       </div>
 
@@ -114,13 +123,13 @@ export default function HeroSection({ profile, socialLinks, defaultResume, proje
               top: `${p.y}%`,
               width: p.size,
               height: p.size,
-              opacity: 0.25,
+              opacity: 0.15,
             }}
             animate={{
-              y: [0, -40, 0],
-              x: [0, 15, -15, 0],
-              opacity: [0.15, 0.5, 0.15],
-              scale: [1, 1.3, 1],
+              y: [0, -35, 0],
+              x: [0, 10, -10, 0],
+              opacity: [0.1, 0.4, 0.1],
+              scale: [1, 1.2, 1],
             }}
             transition={{
               duration: p.duration,
@@ -132,36 +141,33 @@ export default function HeroSection({ profile, socialLinks, defaultResume, proje
         ))}
       </div>
 
-      {/* Main content */}
-      <div className="relative z-10 text-center px-4 max-w-5xl mx-auto w-full py-12 sm:py-16 pb-24 sm:pb-28">
-
-        {/* Floating badge */}
+      {/* Main Container */}
+      <div className="relative z-10 text-center px-4 max-w-5xl mx-auto w-full flex flex-col items-center">
+        
+        {/* Availability Badge */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-[var(--color-primary)]/20 text-sm text-[var(--color-primary)] font-medium mb-8"
+          transition={{ duration: 0.5 }}
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass border border-[var(--color-primary)]/20 text-xs text-[var(--color-primary)] font-semibold mb-6 shadow-sm"
         >
-          <Sparkles size={14} className="animate-pulse" />
-          Available for opportunities
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          Available for Opportunities
         </motion.div>
 
-        {/* Profile Photo */}
+        {/* Profile Image with subtle premium ring */}
         {profile?.photoURL ? (
           <motion.div
-            initial={{ opacity: 0, scale: 0.5 }}
+            initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, ease: [0.34, 1.56, 0.64, 1] }}
-            className="mb-8 inline-block"
+            transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+            className="mb-6"
           >
-            <div className="relative">
-              {/* Glow ring */}
-              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-violet-500 via-indigo-500 to-pink-500 blur-md opacity-60 scale-110 animate-pulse-glow" />
-              {/* Spinning ring */}
-              <div className="absolute inset-0 rounded-full border-2 border-dashed border-[var(--color-primary)]/40 animate-spin-slow" style={{ margin: '-8px' }} />
-              {/* Photo */}
-              <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden ring-3 ring-white/80 dark:ring-white/10 shadow-2xl">
+            <div className="relative w-28 h-28 md:w-32 md:h-32 rounded-full p-1 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] shadow-xl">
+              <div className="relative w-full h-full rounded-full overflow-hidden bg-white dark:bg-[var(--color-bg)]">
                 <Image
                   src={profile.photoURL}
                   alt={profile.displayName}
@@ -174,15 +180,13 @@ export default function HeroSection({ profile, socialLinks, defaultResume, proje
           </motion.div>
         ) : (
           <motion.div
-            initial={{ opacity: 0, scale: 0.5 }}
+            initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, ease: [0.34, 1.56, 0.64, 1] }}
-            className="mb-8 inline-block"
+            transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+            className="mb-6"
           >
-            <div className="relative">
-              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-violet-500 via-indigo-500 to-pink-500 blur-md opacity-40 scale-110" />
-              <div className="absolute inset-0 rounded-full border-2 border-dashed border-[var(--color-primary)]/30 animate-spin-slow" style={{ margin: '-8px' }} />
-              <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-full bg-gradient-to-br from-violet-500 via-indigo-500 to-pink-500 flex items-center justify-center shadow-2xl text-white text-4xl md:text-5xl font-bold">
+            <div className="relative w-28 h-28 md:w-32 md:h-32 rounded-full p-1 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] shadow-xl flex items-center justify-center">
+              <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white text-3xl font-extrabold shadow-inner">
                 {(profile?.displayName || 'D')[0].toUpperCase()}
               </div>
             </div>
@@ -191,50 +195,44 @@ export default function HeroSection({ profile, socialLinks, defaultResume, proje
 
         {/* Name */}
         <motion.h1
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className="text-4xl md:text-6xl lg:text-7xl font-bold text-[var(--color-text)] mb-4 tracking-tight"
+          transition={{ duration: 0.6, delay: 0.15 }}
+          className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-[var(--color-text)] mb-3 tracking-tight leading-none"
         >
           Hi, I&apos;m{' '}
-          <span className="gradient-text-animated">{profile?.displayName || 'Developer'}</span>
+          <span className="gradient-text-animated">{profile?.displayName || 'Abhigith'}</span>
         </motion.h1>
 
-        {/* Dynamic Role with animated underline */}
+        {/* Animated Role Underlined */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="h-12 md:h-14 mb-4 flex items-center justify-center"
+          transition={{ duration: 0.5, delay: 0.25 }}
+          className="h-10 mb-4 flex items-center justify-center"
         >
           <motion.div
             key={currentRoleIndex}
-            initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
+            initial={{ opacity: 0, y: 15, filter: 'blur(4px)' }}
             animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -20, filter: 'blur(8px)' }}
-            transition={{ duration: 0.5 }}
+            exit={{ opacity: 0, y: -15, filter: 'blur(4px)' }}
+            transition={{ duration: 0.4 }}
             className="relative"
           >
-            <p className="text-2xl md:text-3xl text-[var(--color-primary)] font-semibold">
+            <p className="text-xl md:text-2xl text-[var(--color-primary)] font-bold tracking-tight">
               {roles[currentRoleIndex]}
             </p>
-            <motion.div
-              className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[var(--color-primary)] to-transparent"
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            />
           </motion.div>
         </motion.div>
 
         {/* Bio / Title */}
         <motion.p
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="text-base md:text-lg text-[var(--color-text-secondary)] mb-3 max-w-2xl mx-auto text-balance leading-relaxed"
+          transition={{ duration: 0.5, delay: 0.35 }}
+          className="text-lg md:text-xl text-[var(--color-text-secondary)] font-normal max-w-2xl mx-auto leading-relaxed mb-4 text-balance"
         >
-          {profile?.title || 'Full Stack Developer'}
+          Building reliable software through testing, automation and modern web technologies.
         </motion.p>
 
         {/* Location */}
@@ -242,8 +240,8 @@ export default function HeroSection({ profile, socialLinks, defaultResume, proje
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            className="text-sm text-[var(--color-text-muted)] mb-8 flex items-center justify-center gap-1.5"
+            transition={{ duration: 0.5, delay: 0.45 }}
+            className="text-xs text-[var(--color-text-muted)] mb-8 flex items-center gap-1.5"
           >
             <MapPin size={13} className="text-[var(--color-primary)]" />
             {profile.location}
@@ -254,31 +252,32 @@ export default function HeroSection({ profile, socialLinks, defaultResume, proje
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.7 }}
-          className="flex flex-wrap gap-4 justify-center mb-10"
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="flex flex-wrap gap-3 justify-center mb-8 w-full max-w-md"
         >
+          <Button size="lg" onClick={() => handleScrollTo('projects')} className="w-full sm:w-auto">
+            View Projects
+          </Button>
+          <Button variant="outline" size="lg" onClick={() => handleScrollTo('contact')} className="w-full sm:w-auto">
+            <Mail size={16} />
+            Contact Me
+          </Button>
           {defaultResume && (
-            <a href={defaultResume.fileUrl} target="_blank" rel="noopener noreferrer">
-              <Button size="lg">
-                <Download size={18} />
-                Download Resume
+            <a href={defaultResume.fileUrl} target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
+              <Button variant="secondary" size="lg" className="w-full">
+                <Download size={16} />
+                Resume
               </Button>
             </a>
           )}
-          <a href="#contact">
-            <Button variant="outline" size="lg">
-              <Mail size={18} />
-              Contact Me
-            </Button>
-          </a>
         </motion.div>
 
-        {/* Social Links */}
+        {/* Social Icons */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.9 }}
-          className="flex justify-center gap-3"
+          transition={{ duration: 0.5, delay: 0.6 }}
+          className="flex justify-center gap-3 mb-12"
         >
           {socialLinks.filter(l => l.isVisible).map((link, i) => (
             <motion.a
@@ -286,10 +285,10 @@ export default function HeroSection({ profile, socialLinks, defaultResume, proje
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              initial={{ opacity: 0, scale: 0 }}
+              initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.9 + i * 0.1, type: 'spring', stiffness: 200 }}
-              className="p-3 rounded-xl glass text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] hover:scale-110 hover:shadow-lg transition-all duration-300 hover:border-[var(--color-primary)]/30"
+              transition={{ delay: 0.6 + i * 0.08, type: 'spring', stiffness: 200 }}
+              className="p-2.5 rounded-xl glass text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] hover:scale-105 hover:shadow-md transition-all duration-300 hover:border-[var(--color-primary)]/20"
               aria-label={link.platform}
             >
               {getIcon(link.icon)}
@@ -297,38 +296,55 @@ export default function HeroSection({ profile, socialLinks, defaultResume, proje
           ))}
         </motion.div>
 
-        {/* Stats row */}
+        {/* Dynamic Recruiter Stats Panel */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 1.1 }}
-          className="mt-10 sm:mt-16 grid grid-cols-3 gap-2 sm:gap-4 max-w-xs sm:max-w-sm mx-auto"
+          transition={{ duration: 0.6, delay: 0.7 }}
+          className="w-full max-w-4xl grid grid-cols-2 md:grid-cols-4 gap-4 px-2"
         >
-          {stats.map((stat) => (
-            <div key={stat.label} className="text-center p-2 sm:p-3 rounded-xl sm:rounded-2xl glass border border-[var(--color-border)]">
-              <p className="text-base sm:text-xl font-bold gradient-text">{stat.value}</p>
-              <p className="text-[10px] sm:text-xs text-[var(--color-text-muted)] mt-0.5">{stat.label}</p>
-            </div>
-          ))}
+          {stats.map((stat) => {
+            const Icon = stat.icon;
+            return (
+              <div
+                key={stat.label}
+                className="flex flex-col items-center text-center p-4 rounded-2xl glass border border-[var(--color-border)] hover:border-[var(--color-primary)]/20 transition-all duration-300 hover:shadow-md hover:shadow-[var(--color-primary)]/5"
+              >
+                <div className="p-2 rounded-lg bg-[var(--color-primary)]/5 text-[var(--color-primary)] mb-2">
+                  <Icon size={16} />
+                </div>
+                <p className="text-2xl md:text-3xl font-extrabold text-[var(--color-text)]">
+                  <AnimatedCounter value={stat.value} />
+                  <span className="text-[var(--color-primary)]">{stat.suffix}</span>
+                </p>
+                <p className="text-xs text-[var(--color-text-secondary)] font-medium mt-1 uppercase tracking-wider">
+                  {stat.label}
+                </p>
+              </div>
+            );
+          })}
         </motion.div>
       </div>
 
-      {/* Scroll Indicator */}
+      {/* Scroll Down Chevron */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 0.6 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        transition={{ delay: 1.2, duration: 0.5 }}
+        className="absolute bottom-6 left-1/2 -translate-x-1/2"
       >
-        <a href="#about" className="flex flex-col items-center gap-1 text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors group">
-          <span className="text-xs font-medium opacity-60 group-hover:opacity-100 transition-opacity">Scroll</span>
+        <button
+          onClick={() => handleScrollTo('about')}
+          className="flex flex-col items-center gap-1 text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors group cursor-pointer"
+        >
+          <span className="text-xs font-semibold tracking-wider opacity-60 group-hover:opacity-100 transition-opacity">Scroll</span>
           <motion.div
-            animate={{ y: [0, 8, 0] }}
+            animate={{ y: [0, 6, 0] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
-            <ChevronDown size={20} />
+            <ChevronDown size={18} />
           </motion.div>
-        </a>
+        </button>
       </motion.div>
     </section>
   );
