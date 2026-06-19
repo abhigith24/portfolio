@@ -185,9 +185,15 @@ export default function HeroSection({
             transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
             className="mb-6"
           >
-            <div className="relative w-28 h-28 md:w-32 md:h-32 rounded-full p-1 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] shadow-xl flex items-center justify-center">
-              <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white text-3xl font-extrabold shadow-inner">
-                {(profile?.displayName || 'D')[0].toUpperCase()}
+            <div className="relative w-28 h-28 md:w-32 md:h-32 rounded-full p-1 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] shadow-xl">
+              <div className="relative w-full h-full rounded-full overflow-hidden bg-white dark:bg-[var(--color-bg)]">
+                <Image
+                  src="/logo-circle.png"
+                  alt={profile?.displayName || 'Abhigith'}
+                  fill
+                  className="object-cover"
+                  priority
+                />
               </div>
             </div>
           </motion.div>

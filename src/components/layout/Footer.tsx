@@ -1,6 +1,7 @@
 'use client';
 
 import { Heart } from 'lucide-react';
+import Image from 'next/image';
 import { useVisitorCount } from '@/lib/hooks/useVisitorCount';
 import { NAV_ITEMS } from '@/lib/constants';
 import type { SocialLink } from '@/lib/types';
@@ -22,7 +23,17 @@ export default function Footer({ socialLinks = [], footerText }: FooterProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
           <div>
-            <h3 className="text-lg font-bold gradient-text mb-3">Portfolio</h3>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="relative w-6 h-6 rounded-full overflow-hidden shrink-0">
+                <Image
+                  src="/logo-circle.png"
+                  alt="Logo"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <h3 className="text-lg font-bold gradient-text">Portfolio</h3>
+            </div>
             <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
               {footerText || 'Built with passion and modern technologies. Always learning, always growing.'}
             </p>

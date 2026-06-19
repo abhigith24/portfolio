@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Code2 } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
+import Image from 'next/image';
 import { NAV_ITEMS } from '@/lib/constants';
 import ThemeToggle from './ThemeToggle';
 import { cn } from '@/lib/utils';
@@ -58,8 +59,13 @@ export default function Navbar() {
           onClick={(e) => { e.preventDefault(); handleNavClick('#hero'); }}
           className="flex items-center gap-2 group"
         >
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-accent)] flex items-center justify-center shadow-lg group-hover:shadow-[var(--color-primary)]/30 transition-shadow">
-            <Code2 size={16} className="text-white" />
+          <div className="relative w-8 h-8 rounded-full overflow-hidden flex items-center justify-center shadow-lg group-hover:shadow-[var(--color-primary)]/30 transition-all duration-300">
+            <Image
+              src="/logo-circle.png"
+              alt="Logo"
+              fill
+              className="object-cover"
+            />
           </div>
           <span className="text-lg font-bold gradient-text hidden sm:block">Portfolio</span>
         </a>
